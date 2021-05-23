@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'constants.dart';
 import 'dart:math' as math;
+import 'package:text_x_arc/text_x_arc.dart';
 
 class CCDAGraphicPaint extends StatelessWidget {
   final double width;
@@ -18,10 +19,15 @@ class CCDAGraphicPaint extends StatelessWidget {
 }
 
 class CCDAGraphicPainter extends CustomPainter {
-  final ccSectionStart =
-      (int i) => Constants.North + (Constants.CCSectionPortionRadians * i);
-  final ibmSectionStart =
-      (int i) => Constants.North + (Constants.IBMSectionPortionRadians * i);
+  final ccSectionStart = (int i) =>
+      Constants.NorthRadians + (Constants.CCSectionPortionRadians * i);
+  final ibmSectionStart = (int i) =>
+      Constants.NorthRadians + (Constants.IBMSectionPortionRadians * i);
+
+  final ccSectionStartDegrees = (int i) =>
+      Constants.NorthDegrees + (Constants.CCSectionPortionDegrees * i);
+  final ibmSectionStartDegrees = (int i) =>
+      Constants.NorthDegrees + (Constants.IBMSectionPortionDegrees * i);
 
   @override
   void paint(Canvas canvas, Size size) async {
@@ -40,19 +46,27 @@ class CCDAGraphicPainter extends CustomPainter {
       textBaseline: TextBaseline.alphabetic,
     );
 
-    final ccTextRadius =
-        ccLogoRadius + ((ccSectionRadius - ccLogoRadius) / 3.5);
+    final ibmTextStyle = ccTextStyle;
+
+    final textPainter = TextPainter(
+      textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
+    );
+
+    final ccTextRadius = ccLogoRadius + ((ccSectionRadius - ccLogoRadius) / 2);
+
+    final ibmTextRadius = ibmSectionRadius - 10;
 
     final ccLogoBrush = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.fill;
 
     final ccResearchSectionBrush = Paint()
-      ..color = Constants.ccBlue
+      ..color = Constants.CCBlue
       ..style = PaintingStyle.fill;
 
     final ccITSectionBrush = Paint()
-      ..color = Constants.ccGreen
+      ..color = Constants.CCGreen
       ..style = PaintingStyle.fill;
 
     final ccSectionRect = Rect.fromCircle(
@@ -114,30 +128,62 @@ class CCDAGraphicPainter extends CustomPainter {
     // CC Logo
     canvas.drawCircle(center, ccLogoRadius, ccLogoBrush);
 
-    paintTextArc(
-      canvas,
-      ccTextRadius,
-      "Research",
-      ccTextStyle,
-      size,
-      Constants.CCSectionPortionRadians,
-      initialAngle: ccSectionStart(0),
-    );
+    Constants.CCSectionTitles.asMap().forEach((i, title) {
+      newPaintTextArc(
+        title,
+        canvas,
+        size,
+        ccTextRadius,
+        textPainter,
+        ccTextStyle,
+        ccSectionStartDegrees(i),
+        ccSectionStartDegrees(i) + Constants.CCSectionPortionDegrees,
+        ArcTextBaseline.Center,
+      );
+    });
 
-    paintTextArc(
-      canvas,
-      ccTextRadius,
-      "IT",
-      ccTextStyle,
-      size,
-      Constants.CCSectionPortionRadians,
-      initialAngle: ccSectionStart(1),
-    );
+    Constants.IBMSectionTitles.asMap().forEach((i, title) {
+      newPaintTextArc(
+        title,
+        canvas,
+        size,
+        ibmTextRadius,
+        textPainter,
+        ibmTextStyle,
+        ibmSectionStartDegrees(i),
+        ibmSectionStartDegrees(i) + Constants.IBMSectionPortionDegrees,
+        ArcTextBaseline.Inner,
+      );
+    });
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return false;
+  }
+
+  newPaintTextArc(
+    String text,
+    Canvas canvas,
+    Size size,
+    double radius,
+    TextPainter textPainter,
+    TextStyle style,
+    double startAngle,
+    double endAngle,
+    ArcTextBaseline baseline,
+  ) {
+    final centerPos = Offset(size.width / 2, size.height / 2);
+    XArcTextDrawer.draw(
+        canvas: canvas,
+        centerPos: centerPos,
+        radius: radius,
+        text: text,
+        startAngle: startAngle,
+        endAngle: endAngle,
+        textStyle: style,
+        textPainter: textPainter,
+        baseline: baseline);
   }
 
   void paintTextArc(
@@ -146,16 +192,16 @@ class CCDAGraphicPainter extends CustomPainter {
     String text,
     TextStyle style,
     Size size,
-    double canvasArcRadians, {
+    double sectionArcRadians, {
     double initialAngle = 0,
   }) {
     canvas.save();
     canvas.translate(size.width / 2, size.height / 2 - radius);
 
     double textPixelLength = calculateTextWidth(text, style);
-
     double textRadians = textPixelLength / radius;
-    initialAngle += (canvasArcRadians - (textRadians / 2));
+    double offset = (sectionArcRadians - (textRadians / 2));
+    initialAngle = initialAngle + offset;
 
     if (initialAngle != 0) {
       final d = 2 * radius * math.sin(initialAngle / 2);
@@ -200,7 +246,12 @@ class CCDAGraphicPainter extends CustomPainter {
   }
 
   double calculateLetterWidth(String c, TextStyle style) {
+    textPainterFor(c, style).preferredLineHeight;
     return textPainterFor(c, style).width;
+  }
+
+  double calculateLine(String c, TextStyle style) {
+    return textPainterFor(c, style).preferredLineHeight;
   }
 
   double calculateTextWidth(String s, TextStyle style) {
