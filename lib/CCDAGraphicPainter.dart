@@ -1,42 +1,73 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'constants.dart';
 import 'package:text_x_arc/text_x_arc.dart';
 
+class PainterData {
+  Offset widgetSize;
+  Function(TapUpDetails) handleTap;
+
+  PainterData(this.widgetSize, this.handleTap);
+}
+
 class CCDAGraphicPaint extends StatelessWidget {
   final double width;
   final double height;
+  final painterData = PainterData(Offset(0, 0), (_) => {});
 
-  const CCDAGraphicPaint({required this.width, required this.height});
+  CCDAGraphicPaint({required this.width, required this.height});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapUp: handleTap,
       child: CustomPaint(
-        painter: CCDAGraphicPainter(),
+        painter: CCDAGraphicPainter(setData),
       ),
     );
   }
 
+  void setData(PainterData d) {
+    painterData.widgetSize = d.widgetSize;
+    painterData.handleTap = d.handleTap;
+  }
+
   handleTap(TapUpDetails tapUpDetails) {
-    tapUpDetails.toString();
-    var l = tapUpDetails.localPosition;
-    var g = tapUpDetails.globalPosition;
-    var k = tapUpDetails.kind;
+    painterData.handleTap(tapUpDetails);
   }
 }
 
 class CCDAGraphicPainter extends CustomPainter {
+  final Function(PainterData) setData;
+  Offset widgetSize = Offset.zero;
+  Offset center = Offset.zero;
+
+  CCDAGraphicPainter(this.setData);
+
   final ibmSectionStart = (int i) =>
       Constants.NorthRadians + (Constants.IBMSectionPortionRadians * i);
 
   final ibmSectionStartDegrees = (int i) =>
       Constants.NorthDegrees + (Constants.IBMSectionPortionDegrees * i);
 
+  handleTap(TapUpDetails tapUpDetails) {
+    var l = tapUpDetails.localPosition;
+    var zeroCenterPoint = Offset((l.dx - center.dx), (l.dy - center.dy));
+    Constants.ibmSectionInfo.asMap().forEach((i, info) {
+      if (info.checkPointForIBM(zeroCenterPoint)) {
+        log("Clicked " + i.toString());
+      }
+    });
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
+    center = Offset(size.width / 2, size.height / 2);
+
+    setData(PainterData(center, handleTap));
+
     final side = size.shortestSide;
 
     final ccLogoRadius = side * Constants.CCLogoSizePct;
@@ -49,6 +80,7 @@ class CCDAGraphicPainter extends CustomPainter {
     Constants.setIBMFontSize(fontSize);
 
     Constants.setIBMTitleRadius(ibmSectionRadius - 10);
+    Constants.setIBMSectionRadius(ibmSectionRadius);
     Constants.setIBMRect(Rect.fromCircle(
       center: center,
       radius: ibmSectionRadius,

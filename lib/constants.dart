@@ -31,13 +31,52 @@ class DrawingInfo {
 class SectionInfo {
   String title;
   Paint sectionBrush;
-  late DrawingInfo drawingInfo;
+  DrawingInfo drawingInfo;
+  int sectionNumber;
+  double sectionPortionDegrees;
 
   SectionInfo({
+    required this.sectionNumber,
     required this.title,
     required this.sectionBrush,
     required this.drawingInfo,
+    required this.sectionPortionDegrees,
   });
+
+  bool checkPointForIBM(Offset point) {
+    double radius = drawingInfo.sectionRadius;
+
+    double startAngle =
+        correctForNegative(drawingInfo.sectionStartDegrees(sectionNumber));
+
+    double sectionPercent = sectionPortionDegrees / 360;
+    double endAngle = (360 * sectionPercent) + startAngle;
+
+    var angle = calculateAngle(point);
+    var rayLen = calculateRayLength(point);
+
+    if (angle >= math.min(startAngle, endAngle) &&
+        angle <= math.max(startAngle, endAngle) &&
+        rayLen < radius)
+      return true;
+    else
+      return false;
+  }
+
+  calculateAngle(Offset p) {
+    var a = vector.degrees(math.atan2(p.dy, p.dx));
+    return correctForNegative(a);
+  }
+
+  correctForNegative(double a) {
+    return a < 0 ? 360 + a : a;
+  }
+
+  calculateRayLength(Offset p) {
+    var asq = math.pow(p.dx, 2);
+    var bsq = math.pow(p.dy, 2);
+    return math.sqrt(asq + bsq);
+  }
 }
 
 class Constants {
@@ -50,15 +89,15 @@ class Constants {
   static const CCLogoSizePct = 0.10;
 
   // CC Section
-  static const CCSectionSizePct = 0.20;
-  static const CCSectionPortionRadians = math.pi; // 180 degrees
-  static const CCSectionPortionDegrees = 180; // 180 degrees
+  static const double CCSectionSizePct = 0.20;
+  static const double CCSectionPortionRadians = math.pi; // 180 degrees
+  static const double CCSectionPortionDegrees = 180; // 180 degrees
 
   // IBM Section
-  static const IBMSectionSizePct = 0.5;
+  static const double IBMSectionSizePct = 0.5;
   // 360 degrees / 8 = 45 degrees
-  static const IBMSectionPortionRadians = ((math.pi * 2) / 8);
-  static const IBMSectionPortionDegrees = (360 / 8);
+  static const double IBMSectionPortionRadians = ((math.pi * 2) / 8);
+  static const double IBMSectionPortionDegrees = (360 / 8);
 
   // Colors
   static const CCBlue = Color.fromRGBO(6, 103, 171, 1.0);
@@ -164,57 +203,77 @@ class Constants {
 
   static final ccSectionInfo = [
     SectionInfo(
+      sectionNumber: 0,
       title: "Research",
       sectionBrush: paintFor(color: CCBlue),
       drawingInfo: ccDrawingInfo,
+      sectionPortionDegrees: Constants.CCSectionPortionDegrees,
     ),
     SectionInfo(
+      sectionNumber: 1,
       title: "IT",
       sectionBrush: paintFor(color: CCGreen),
       drawingInfo: ccDrawingInfo,
+      sectionPortionDegrees: Constants.CCSectionPortionDegrees,
     ),
   ];
 
   static final ibmSectionInfo = [
     SectionInfo(
+      sectionNumber: 0,
       title: "Research",
       sectionBrush: paintFor(color: Colors.amber),
       drawingInfo: ibmDrawingInfo,
+      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
     ),
     SectionInfo(
+      sectionNumber: 1,
       title: "GBS",
       sectionBrush: paintFor(color: Colors.deepOrange),
       drawingInfo: ibmDrawingInfo,
+      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
     ),
     SectionInfo(
+      sectionNumber: 2,
       title: "Systems",
       sectionBrush: paintFor(color: Colors.lime),
       drawingInfo: ibmDrawingInfo,
+      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
     ),
     SectionInfo(
+      sectionNumber: 3,
       title: "Garage",
       sectionBrush: paintFor(color: Colors.blue),
       drawingInfo: ibmDrawingInfo,
+      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
     ),
     SectionInfo(
+      sectionNumber: 4,
       title: "Research",
       sectionBrush: paintFor(color: Colors.amber),
       drawingInfo: ibmDrawingInfo,
+      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
     ),
     SectionInfo(
+      sectionNumber: 5,
       title: "GBS",
       sectionBrush: paintFor(color: Colors.deepOrange),
       drawingInfo: ibmDrawingInfo,
+      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
     ),
     SectionInfo(
+      sectionNumber: 6,
       title: "Systems",
       sectionBrush: paintFor(color: Colors.lime),
       drawingInfo: ibmDrawingInfo,
+      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
     ),
     SectionInfo(
+      sectionNumber: 7,
       title: "Garage",
       sectionBrush: paintFor(color: Colors.blue),
       drawingInfo: ibmDrawingInfo,
+      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
     ),
   ];
 }
