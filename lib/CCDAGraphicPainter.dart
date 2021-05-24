@@ -11,9 +11,19 @@ class CCDAGraphicPaint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: CCDAGraphicPainter(),
+    return GestureDetector(
+      onTapUp: handleTap,
+      child: CustomPaint(
+        painter: CCDAGraphicPainter(),
+      ),
     );
+  }
+
+  handleTap(TapUpDetails tapUpDetails) {
+    tapUpDetails.toString();
+    var l = tapUpDetails.localPosition;
+    var g = tapUpDetails.globalPosition;
+    var k = tapUpDetails.kind;
   }
 }
 
@@ -68,6 +78,14 @@ class CCDAGraphicPainter extends CustomPainter {
         sectInfo.drawingInfo.sectionPortionRadians,
         true,
         sectInfo.sectionBrush,
+      );
+
+      canvas.drawArc(
+        sectInfo.drawingInfo.rect!,
+        sectInfo.drawingInfo.sectionStartRadians(i),
+        sectInfo.drawingInfo.sectionPortionRadians,
+        true,
+        Constants.outlinePaint,
       );
 
       paintArcText(

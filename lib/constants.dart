@@ -41,6 +41,7 @@ class SectionInfo {
 }
 
 class Constants {
+  static const OneDegreeInRadians = 0.0174533;
   // Origin at 90 degrees, so counter rotate 90 degrees
   static const NorthRadians = -math.pi / 2;
   static const NorthDegrees = -90.0;
@@ -56,8 +57,8 @@ class Constants {
   // IBM Section
   static const IBMSectionSizePct = 0.5;
   // 360 degrees / 8 = 45 degrees
-  static const IBMSectionPortionRadians = (math.pi * 2) / 8;
-  static const IBMSectionPortionDegrees = 360 / 8;
+  static const IBMSectionPortionRadians = ((math.pi * 2) / 8);
+  static const IBMSectionPortionDegrees = (360 / 8);
 
   // Colors
   static const CCBlue = Color.fromRGBO(6, 103, 171, 1.0);
@@ -70,7 +71,9 @@ class Constants {
       (int i) => vector.degrees(ccSectionStartRadians(i));
 
   static final ibmSectionStartRadians = (int i) =>
-      Constants.NorthRadians + (Constants.IBMSectionPortionRadians * i);
+      Constants.NorthRadians +
+      (Constants.IBMSectionPortionRadians * i) +
+      OneDegreeInRadians;
 
   static final ibmSectionStartDegrees =
       (int i) => vector.degrees(ibmSectionStartRadians(i));
@@ -147,9 +150,15 @@ class Constants {
     });
   }
 
+  static final outlinePaint = Paint()
+    ..color = Colors.white
+    ..strokeWidth = 4.0
+    ..style = PaintingStyle.stroke;
+
   static Paint paintFor({required Color color}) {
     final p = Paint();
     p.color = color;
+    p.style = PaintingStyle.fill;
     return p;
   }
 

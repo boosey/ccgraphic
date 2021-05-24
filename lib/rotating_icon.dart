@@ -13,7 +13,7 @@ class RotatingIcon extends StatefulWidget {
 class _RotatingIconState extends State<RotatingIcon>
     with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
-    duration: const Duration(milliseconds: 1500),
+    duration: const Duration(milliseconds: 2500),
     vsync: this,
   )..forward();
 
