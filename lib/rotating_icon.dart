@@ -28,15 +28,23 @@ class _RotatingIconState extends State<RotatingIcon>
     super.dispose();
   }
 
+  animateIcon() {
+    _controller.reset();
+    _controller.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
     return RotationTransition(
       turns: _animation,
-      child: Image.asset(
-        'assets/icons/cc_icon4.png',
-        width: widget.width,
-        height: widget.height,
-        colorBlendMode: BlendMode.srcATop,
+      child: GestureDetector(
+        onTap: animateIcon,
+        child: Image.asset(
+          'assets/icons/cc_icon4.png',
+          width: widget.width,
+          height: widget.height,
+          colorBlendMode: BlendMode.srcATop,
+        ),
       ),
     );
   }
