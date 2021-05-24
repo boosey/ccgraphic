@@ -30,7 +30,7 @@ class CCDAGraphicPainter extends CustomPainter {
       Constants.NorthDegrees + (Constants.IBMSectionPortionDegrees * i);
 
   @override
-  void paint(Canvas canvas, Size size) async {
+  void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final side = size.shortestSide;
     final ccLogoRadius = side * Constants.CCLogoSizePct;

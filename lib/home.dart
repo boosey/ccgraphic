@@ -1,3 +1,4 @@
+import 'package:ccgraphic/rotating_icon.dart';
 import 'package:flutter/material.dart';
 import 'CCDAGraphicPainter.dart';
 import 'constants.dart';
@@ -23,12 +24,10 @@ class HomeWidget extends StatelessWidget {
                   width: constraints.maxWidth,
                 ),
               ),
-              Image.asset(
-                'assets/icons/cc_icon4.png',
+              RotatingIcon(
                 width: constraints.maxWidth * Constants.CCLogoSizePct,
                 height: constraints.maxHeight * Constants.CCLogoSizePct,
-                colorBlendMode: BlendMode.srcATop,
-              )
+              ),
             ],
           ),
         ),
