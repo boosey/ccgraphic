@@ -1,5 +1,44 @@
 import 'dart:math' as math;
-import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:text_x_arc/text_x_arc.dart';
+import 'package:vector_math/vector_math.dart' as vector;
+
+class DrawingInfo {
+  Rect? rect;
+  double sectionRadius = 0;
+  double titleRadius = 0;
+  double Function(int) sectionStartRadians;
+  double Function(int) sectionStartDegrees;
+  double sectionPortionRadians;
+  late TextStyle style;
+  ArcTextBaseline baseline;
+
+  DrawingInfo({
+    required this.sectionStartRadians,
+    required this.sectionStartDegrees,
+    required this.sectionPortionRadians,
+    required this.baseline,
+    required this.style,
+  });
+
+  double get sectionPortionDegrees => vector.degrees(sectionPortionRadians);
+
+  set fontSize(double s) {
+    this.style = this.style.copyWith(fontSize: s);
+  }
+}
+
+class SectionInfo {
+  String title;
+  Paint sectionBrush;
+  late DrawingInfo drawingInfo;
+
+  SectionInfo({
+    required this.title,
+    required this.sectionBrush,
+    required this.drawingInfo,
+  });
+}
 
 class Constants {
   // Origin at 90 degrees, so counter rotate 90 degrees
@@ -24,18 +63,149 @@ class Constants {
   static const CCBlue = Color.fromRGBO(6, 103, 171, 1.0);
   static const CCGreen = Color.fromRGBO(0, 106, 58, 1.0);
 
-  static const CCSectionTitles = [
-    "Research",
-    "IT",
+  static final ccSectionStartRadians = (int i) =>
+      Constants.NorthRadians + (Constants.CCSectionPortionRadians * i);
+
+  static final ccSectionStartDegrees =
+      (int i) => vector.degrees(ccSectionStartRadians(i));
+
+  static final ibmSectionStartRadians = (int i) =>
+      Constants.NorthRadians + (Constants.IBMSectionPortionRadians * i);
+
+  static final ibmSectionStartDegrees =
+      (int i) => vector.degrees(ibmSectionStartRadians(i));
+
+  static final ccDrawingInfo = DrawingInfo(
+    sectionStartRadians: ccSectionStartRadians,
+    sectionStartDegrees: ccSectionStartDegrees,
+    sectionPortionRadians: Constants.CCSectionPortionRadians,
+    baseline: ArcTextBaseline.Inner,
+    style: ccTextStyle,
+  );
+
+  static final ibmDrawingInfo = DrawingInfo(
+    sectionStartRadians: ibmSectionStartRadians,
+    sectionStartDegrees: ibmSectionStartDegrees,
+    sectionPortionRadians: Constants.IBMSectionPortionRadians,
+    baseline: ArcTextBaseline.Inner,
+    style: ibmTextStyle,
+  );
+
+  static final ccTextStyle = TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+    textBaseline: TextBaseline.alphabetic,
+  );
+
+  static final ibmTextStyle = ccTextStyle;
+
+  static setCCRect(Rect r) {
+    ccSectionInfo.asMap().forEach((i, s) {
+      s.drawingInfo.rect = r;
+    });
+  }
+
+  static setCCFontSize(double size) {
+    ccSectionInfo.asMap().forEach((i, s) {
+      s.drawingInfo.style = s.drawingInfo.style.copyWith(fontSize: size);
+    });
+  }
+
+  static setCCTitleRadius(double r) {
+    ccSectionInfo.asMap().forEach((i, s) {
+      s.drawingInfo.titleRadius = r;
+    });
+  }
+
+  static setCCSectionRadius(double r) {
+    ccSectionInfo.asMap().forEach((i, s) {
+      s.drawingInfo.sectionRadius = r;
+    });
+  }
+
+  static setIBMRect(Rect r) {
+    ibmSectionInfo.asMap().forEach((i, s) {
+      s.drawingInfo.rect = r;
+    });
+  }
+
+  static setIBMFontSize(double size) {
+    ibmSectionInfo.asMap().forEach((i, s) {
+      s.drawingInfo.style = s.drawingInfo.style.copyWith(fontSize: size);
+    });
+  }
+
+  static setIBMTitleRadius(double r) {
+    ibmSectionInfo.asMap().forEach((i, s) {
+      s.drawingInfo.titleRadius = r;
+    });
+  }
+
+  static setIBMSectionRadius(double r) {
+    ibmSectionInfo.asMap().forEach((i, s) {
+      s.drawingInfo.sectionRadius = r;
+    });
+  }
+
+  static Paint paintFor({required Color color}) {
+    final p = Paint();
+    p.color = color;
+    return p;
+  }
+
+  static final ccSectionInfo = [
+    SectionInfo(
+      title: "Research",
+      sectionBrush: paintFor(color: CCBlue),
+      drawingInfo: ccDrawingInfo,
+    ),
+    SectionInfo(
+      title: "IT",
+      sectionBrush: paintFor(color: CCGreen),
+      drawingInfo: ccDrawingInfo,
+    ),
   ];
-  static const IBMSectionTitles = [
-    "Research",
-    "GBS",
-    "Systems",
-    "Garage",
-    "Research",
-    "GBS",
-    "Systems",
-    "Garage",
+
+  static final ibmSectionInfo = [
+    SectionInfo(
+      title: "Research",
+      sectionBrush: paintFor(color: Colors.amber),
+      drawingInfo: ibmDrawingInfo,
+    ),
+    SectionInfo(
+      title: "GBS",
+      sectionBrush: paintFor(color: Colors.deepOrange),
+      drawingInfo: ibmDrawingInfo,
+    ),
+    SectionInfo(
+      title: "Systems",
+      sectionBrush: paintFor(color: Colors.lime),
+      drawingInfo: ibmDrawingInfo,
+    ),
+    SectionInfo(
+      title: "Garage",
+      sectionBrush: paintFor(color: Colors.blue),
+      drawingInfo: ibmDrawingInfo,
+    ),
+    SectionInfo(
+      title: "Research",
+      sectionBrush: paintFor(color: Colors.amber),
+      drawingInfo: ibmDrawingInfo,
+    ),
+    SectionInfo(
+      title: "GBS",
+      sectionBrush: paintFor(color: Colors.deepOrange),
+      drawingInfo: ibmDrawingInfo,
+    ),
+    SectionInfo(
+      title: "Systems",
+      sectionBrush: paintFor(color: Colors.lime),
+      drawingInfo: ibmDrawingInfo,
+    ),
+    SectionInfo(
+      title: "Garage",
+      sectionBrush: paintFor(color: Colors.blue),
+      drawingInfo: ibmDrawingInfo,
+    ),
   ];
 }
