@@ -26,7 +26,7 @@ class HomeWidget extends StatelessWidget {
               SizedBox(
                 width: shortestSide(constraints),
                 height: shortestSide(constraints),
-                child: CCDAGraphicPaint(),
+                child: CCDAGraphicPaint2(),
               ),
               RotatingIcon(
                 width: constraints.maxWidth * Constants.CCLogoSizePct,

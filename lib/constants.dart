@@ -7,7 +7,9 @@ class DrawingInfo {
   Rect? rect;
   double sectionRadius = 0;
   double titleRadius = 0;
-  double Function(int) sectionStartRadians;
+  double Function(
+    int,
+  ) sectionStartRadians;
   double sectionPortionRadians;
   late TextStyle style;
   ArcTextBaseline baseline;
@@ -51,7 +53,7 @@ class SectionInfo {
     double sectionPercent = sectionPortionDegrees / 360;
     double endAngle = (360 * sectionPercent) + startAngle;
 
-    var angle = calculateAngle(point);
+    var angle = calculateAngleForPoint(point);
     var rayLen = calculateRayLength(point);
 
     if (angle >= math.min(startAngle, endAngle) &&
@@ -62,7 +64,7 @@ class SectionInfo {
       return false;
   }
 
-  calculateAngle(Offset p) {
+  calculateAngleForPoint(Offset p) {
     var a = vector.degrees(math.atan2(p.dy, p.dx));
     return correctForNegative(a);
   }

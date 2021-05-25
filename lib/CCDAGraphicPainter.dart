@@ -1,50 +1,47 @@
 import 'dart:developer';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'constants.dart';
 import 'package:text_x_arc/text_x_arc.dart';
 
-class PainterData {
-  Offset widgetSize;
-  Function(TapUpDetails) handleTap;
-
-  static final _nilFx = (_) => {};
-
-  PainterData.nil()
-      : this.widgetSize = Offset.zero,
-        this.handleTap = _nilFx;
-
-  PainterData(this.widgetSize, this.handleTap);
+class CCDAGraphicPaint2 extends StatefulWidget {
+  @override
+  _CCDAGraphicPaint2State createState() => _CCDAGraphicPaint2State();
 }
 
-class CCDAGraphicPaint extends StatelessWidget {
-  final painterData = PainterData.nil();
+class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2> {
+  double rotationRadians = 0;
+
+  late CCDAGraphicPainter painter;
+
+  @override
+  void initState() {
+    super.initState();
+    painter = CCDAGraphicPainter(this);
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapUp: handleTap,
       child: CustomPaint(
-        painter: CCDAGraphicPainter(setData),
+        painter: painter,
       ),
     );
   }
 
-  void setData(PainterData d) {
-    painterData.widgetSize = d.widgetSize;
-    painterData.handleTap = d.handleTap;
-  }
-
   handleTap(TapUpDetails tapUpDetails) {
-    painterData.handleTap(tapUpDetails);
+    painter.handleTap(tapUpDetails);
   }
 }
 
 class CCDAGraphicPainter extends CustomPainter {
-  final Function(PainterData) setData;
+  final _CCDAGraphicPaint2State widgetState;
   Offset center = Offset.zero;
+  final constants = Constants();
 
-  CCDAGraphicPainter(this.setData);
+  CCDAGraphicPainter(this.widgetState);
 
   handleTap(TapUpDetails tapUpDetails) {
     var l = tapUpDetails.localPosition;
@@ -59,8 +56,6 @@ class CCDAGraphicPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     center = Offset(size.width / 2, size.height / 2);
-
-    setData(PainterData(center, handleTap));
 
     final side = size.shortestSide;
 
@@ -114,6 +109,14 @@ class CCDAGraphicPainter extends CustomPainter {
         Constants.outlinePaint,
       );
 
+      // paintText(
+      //   sectInfo.title,
+      //   canvas,
+      //   sectInfo.drawingInfo.sectionRadius - ccSectionRadius,
+      //   sectInfo.drawingInfo.style.fontSize!,
+      //   sectInfo.drawingInfo.sectionStartRadians(sectInfo.sectionNumber),
+      // );
+
       paintArcText(
         sectInfo.title,
         canvas,
@@ -158,6 +161,30 @@ class CCDAGraphicPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return false;
+  }
+
+  paintText(
+    String text,
+    Canvas canvas,
+    double span,
+    double fontSize,
+    double startAngle,
+  ) {
+    var s = ParagraphStyle(
+      textAlign: TextAlign.center,
+      fontWeight: FontWeight.bold,
+      ellipsis: "...",
+    );
+    var b = ParagraphBuilder(s);
+    b.addText(text);
+    var p = b.build();
+
+    p.layout(ParagraphConstraints(width: span));
+
+    canvas.save();
+    canvas.rotate(startAngle);
+    canvas.drawParagraph(p, Offset(350, 275));
+    canvas.restore();
   }
 
   paintArcText(
