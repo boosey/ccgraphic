@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -11,7 +12,7 @@ class CCDAGraphicPaint2 extends StatefulWidget {
 }
 
 class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2> {
-  double rotationRadians = 0;
+  double rotationRadians = math.pi / 8 * -5;
 
   late CCDAGraphicPainter painter;
 
@@ -39,9 +40,11 @@ class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2> {
 class CCDAGraphicPainter extends CustomPainter {
   final _CCDAGraphicPaint2State widgetState;
   Offset center = Offset.zero;
-  final constants = Constants();
+  late Constants constants;
 
-  CCDAGraphicPainter(this.widgetState);
+  CCDAGraphicPainter(this.widgetState) {
+    constants = Constants(this);
+  }
 
   handleTap(TapUpDetails tapUpDetails) {
     var l = tapUpDetails.localPosition;
@@ -52,6 +55,8 @@ class CCDAGraphicPainter extends CustomPainter {
       }
     });
   }
+
+  double get rotationRadians => widgetState.rotationRadians;
 
   @override
   void paint(Canvas canvas, Size size) {

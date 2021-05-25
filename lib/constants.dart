@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:text_x_arc/text_x_arc.dart';
 import 'package:vector_math/vector_math.dart' as vector;
+import 'CCDAGraphicPainter.dart';
 
 class DrawingInfo {
   Rect? rect;
@@ -83,11 +84,11 @@ class SectionInfo {
 class Constants {
   late DrawingInfo ibmDrawingInfo;
   late DrawingInfo ccDrawingInfo;
-  double rotation = 0;
   late List<SectionInfo> ccSectionInfo;
   late List<SectionInfo> ibmSectionInfo;
+  CCDAGraphicPainter painter;
 
-  Constants() {
+  Constants(this.painter) {
     ccDrawingInfo = DrawingInfo(
       sectionStartRadians: ccSectionStartRadians,
       sectionPortionRadians: Constants.CCSectionPortionRadians,
@@ -202,11 +203,13 @@ class Constants {
   static const CCGreen = Color.fromRGBO(0, 106, 58, 1.0);
 
   double ccSectionStartRadians(int i) {
-    return (Constants.CCSectionPortionRadians * i) + (math.pi / 2) + rotation;
+    return (Constants.CCSectionPortionRadians * i) +
+        (math.pi / 2) +
+        painter.rotationRadians;
   }
 
   double ibmSectionStartRadians(int i) {
-    return (Constants.IBMSectionPortionRadians * i) + rotation;
+    return (Constants.IBMSectionPortionRadians * i) + painter.rotationRadians;
   }
 
   static final ccTextStyle = TextStyle(
