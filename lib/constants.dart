@@ -81,6 +81,104 @@ class SectionInfo {
 }
 
 class Constants {
+  late DrawingInfo ibmDrawingInfo;
+  late DrawingInfo ccDrawingInfo;
+  double rotation = 0;
+  late List<SectionInfo> ccSectionInfo;
+  late List<SectionInfo> ibmSectionInfo;
+
+  Constants() {
+    ccDrawingInfo = DrawingInfo(
+      sectionStartRadians: ccSectionStartRadians,
+      sectionPortionRadians: Constants.CCSectionPortionRadians,
+      baseline: ArcTextBaseline.Inner,
+      style: ccTextStyle,
+    );
+
+    ibmDrawingInfo = DrawingInfo(
+      sectionStartRadians: ibmSectionStartRadians,
+      sectionPortionRadians: Constants.IBMSectionPortionRadians,
+      baseline: ArcTextBaseline.Inner,
+      style: ibmTextStyle,
+    );
+
+    ccSectionInfo = [
+      SectionInfo(
+        sectionNumber: 0,
+        title: "IT",
+        sectionBrush: paintFor(color: CCGreen),
+        drawingInfo: ccDrawingInfo,
+        sectionPortionDegrees: Constants.CCSectionPortionDegrees,
+      ),
+      SectionInfo(
+        sectionNumber: 1,
+        title: "Research",
+        sectionBrush: paintFor(color: CCBlue),
+        drawingInfo: ccDrawingInfo,
+        sectionPortionDegrees: Constants.CCSectionPortionDegrees,
+      ),
+    ];
+
+    ibmSectionInfo = [
+      SectionInfo(
+        sectionNumber: 0,
+        title: "Systems",
+        sectionBrush: paintFor(color: Colors.lime),
+        drawingInfo: ibmDrawingInfo,
+        sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
+      ),
+      SectionInfo(
+        sectionNumber: 1,
+        title: "Garage",
+        sectionBrush: paintFor(color: Colors.blue),
+        drawingInfo: ibmDrawingInfo,
+        sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
+      ),
+      SectionInfo(
+        sectionNumber: 2,
+        title: "Research",
+        sectionBrush: paintFor(color: Colors.amber),
+        drawingInfo: ibmDrawingInfo,
+        sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
+      ),
+      SectionInfo(
+        sectionNumber: 3,
+        title: "GBS",
+        sectionBrush: paintFor(color: Colors.deepOrange),
+        drawingInfo: ibmDrawingInfo,
+        sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
+      ),
+      SectionInfo(
+        sectionNumber: 4,
+        title: "Systems",
+        sectionBrush: paintFor(color: Colors.lime),
+        drawingInfo: ibmDrawingInfo,
+        sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
+      ),
+      SectionInfo(
+        sectionNumber: 5,
+        title: "Garage",
+        sectionBrush: paintFor(color: Colors.blue),
+        drawingInfo: ibmDrawingInfo,
+        sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
+      ),
+      SectionInfo(
+        sectionNumber: 6,
+        title: "Research",
+        sectionBrush: paintFor(color: Colors.amber),
+        drawingInfo: ibmDrawingInfo,
+        sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
+      ),
+      SectionInfo(
+        sectionNumber: 7,
+        title: "GBS",
+        sectionBrush: paintFor(color: Colors.deepOrange),
+        drawingInfo: ibmDrawingInfo,
+        sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
+      ),
+    ];
+  }
+
   // CC Logo level
   static const CCLogoSizePct = 0.10;
 
@@ -103,25 +201,13 @@ class Constants {
   static const CCBlue = Color.fromRGBO(6, 103, 171, 1.0);
   static const CCGreen = Color.fromRGBO(0, 106, 58, 1.0);
 
-  static final ccSectionStartRadians =
-      (int i) => (Constants.CCSectionPortionRadians * i) + (math.pi / 2);
+  double ccSectionStartRadians(int i) {
+    return (Constants.CCSectionPortionRadians * i) + (math.pi / 2) + rotation;
+  }
 
-  static final ibmSectionStartRadians =
-      (int i) => (Constants.IBMSectionPortionRadians * i);
-
-  static final ccDrawingInfo = DrawingInfo(
-    sectionStartRadians: ccSectionStartRadians,
-    sectionPortionRadians: Constants.CCSectionPortionRadians,
-    baseline: ArcTextBaseline.Inner,
-    style: ccTextStyle,
-  );
-
-  static final ibmDrawingInfo = DrawingInfo(
-    sectionStartRadians: ibmSectionStartRadians,
-    sectionPortionRadians: Constants.IBMSectionPortionRadians,
-    baseline: ArcTextBaseline.Inner,
-    style: ibmTextStyle,
-  );
+  double ibmSectionStartRadians(int i) {
+    return (Constants.IBMSectionPortionRadians * i) + rotation;
+  }
 
   static final ccTextStyle = TextStyle(
     color: Colors.white,
@@ -131,43 +217,43 @@ class Constants {
 
   static final ibmTextStyle = ccTextStyle;
 
-  static setCCRect(Rect r) {
+  setCCRect(Rect r) {
     ccSectionInfo.asMap().forEach((i, s) {
       s.drawingInfo.rect = r;
     });
   }
 
-  static setCCFontSize(double size) {
+  setCCFontSize(double size) {
     ccSectionInfo.asMap().forEach((i, s) {
       s.drawingInfo.style = s.drawingInfo.style.copyWith(fontSize: size);
     });
   }
 
-  static setCCTitleRadius(double r) {
+  setCCTitleRadius(double r) {
     ccSectionInfo.asMap().forEach((i, s) {
       s.drawingInfo.titleRadius = r;
     });
   }
 
-  static setIBMRect(Rect r) {
+  setIBMRect(Rect r) {
     ibmSectionInfo.asMap().forEach((i, s) {
       s.drawingInfo.rect = r;
     });
   }
 
-  static setIBMFontSize(double size) {
+  setIBMFontSize(double size) {
     ibmSectionInfo.asMap().forEach((i, s) {
       s.drawingInfo.style = s.drawingInfo.style.copyWith(fontSize: size);
     });
   }
 
-  static setIBMTitleRadius(double r) {
+  setIBMTitleRadius(double r) {
     ibmSectionInfo.asMap().forEach((i, s) {
       s.drawingInfo.titleRadius = r;
     });
   }
 
-  static setIBMSectionRadius(double r) {
+  setIBMSectionRadius(double r) {
     ibmSectionInfo.asMap().forEach((i, s) {
       s.drawingInfo.sectionRadius = r;
     });
@@ -184,80 +270,4 @@ class Constants {
     p.style = PaintingStyle.fill;
     return p;
   }
-
-  static final ccSectionInfo = [
-    SectionInfo(
-      sectionNumber: 0,
-      title: "IT",
-      sectionBrush: paintFor(color: CCGreen),
-      drawingInfo: ccDrawingInfo,
-      sectionPortionDegrees: Constants.CCSectionPortionDegrees,
-    ),
-    SectionInfo(
-      sectionNumber: 1,
-      title: "Research",
-      sectionBrush: paintFor(color: CCBlue),
-      drawingInfo: ccDrawingInfo,
-      sectionPortionDegrees: Constants.CCSectionPortionDegrees,
-    ),
-  ];
-
-  static final ibmSectionInfo = [
-    SectionInfo(
-      sectionNumber: 0,
-      title: "Systems",
-      sectionBrush: paintFor(color: Colors.lime),
-      drawingInfo: ibmDrawingInfo,
-      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
-    ),
-    SectionInfo(
-      sectionNumber: 1,
-      title: "Garage",
-      sectionBrush: paintFor(color: Colors.blue),
-      drawingInfo: ibmDrawingInfo,
-      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
-    ),
-    SectionInfo(
-      sectionNumber: 2,
-      title: "Research",
-      sectionBrush: paintFor(color: Colors.amber),
-      drawingInfo: ibmDrawingInfo,
-      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
-    ),
-    SectionInfo(
-      sectionNumber: 3,
-      title: "GBS",
-      sectionBrush: paintFor(color: Colors.deepOrange),
-      drawingInfo: ibmDrawingInfo,
-      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
-    ),
-    SectionInfo(
-      sectionNumber: 4,
-      title: "Systems",
-      sectionBrush: paintFor(color: Colors.lime),
-      drawingInfo: ibmDrawingInfo,
-      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
-    ),
-    SectionInfo(
-      sectionNumber: 5,
-      title: "Garage",
-      sectionBrush: paintFor(color: Colors.blue),
-      drawingInfo: ibmDrawingInfo,
-      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
-    ),
-    SectionInfo(
-      sectionNumber: 6,
-      title: "Research",
-      sectionBrush: paintFor(color: Colors.amber),
-      drawingInfo: ibmDrawingInfo,
-      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
-    ),
-    SectionInfo(
-      sectionNumber: 7,
-      title: "GBS",
-      sectionBrush: paintFor(color: Colors.deepOrange),
-      drawingInfo: ibmDrawingInfo,
-      sectionPortionDegrees: Constants.IBMSectionPortionDegrees,
-    ),
-  ];
 }

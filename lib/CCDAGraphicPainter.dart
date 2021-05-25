@@ -46,7 +46,7 @@ class CCDAGraphicPainter extends CustomPainter {
   handleTap(TapUpDetails tapUpDetails) {
     var l = tapUpDetails.localPosition;
     var zeroCenterPoint = Offset((l.dx - center.dx), (l.dy - center.dy));
-    Constants.ibmSectionInfo.asMap().forEach((i, info) {
+    constants.ibmSectionInfo.asMap().forEach((i, info) {
       if (info.checkPointForIBM(zeroCenterPoint)) {
         log("Clicked " + i.toString());
       }
@@ -65,12 +65,12 @@ class CCDAGraphicPainter extends CustomPainter {
     final ibmSectionRadius = side * Constants.IBMSectionSizePct;
 
     final fontSize = (ccSectionRadius - ccLogoRadius) / 3;
-    Constants.setCCFontSize(fontSize);
-    Constants.setIBMFontSize(fontSize);
+    constants.setCCFontSize(fontSize);
+    constants.setIBMFontSize(fontSize);
 
-    Constants.setIBMTitleRadius(ibmSectionRadius - 10);
-    Constants.setIBMSectionRadius(ibmSectionRadius);
-    Constants.setIBMRect(Rect.fromCircle(
+    constants.setIBMTitleRadius(ibmSectionRadius - 10);
+    constants.setIBMSectionRadius(ibmSectionRadius);
+    constants.setIBMRect(Rect.fromCircle(
       center: center,
       radius: ibmSectionRadius,
     ));
@@ -80,10 +80,10 @@ class CCDAGraphicPainter extends CustomPainter {
       textDirection: TextDirection.ltr,
     );
 
-    Constants.setCCTitleRadius(
+    constants.setCCTitleRadius(
         ccLogoRadius + ((ccSectionRadius - ccLogoRadius) / 2));
 
-    Constants.setCCRect(Rect.fromCircle(
+    constants.setCCRect(Rect.fromCircle(
       center: center,
       radius: ccSectionRadius,
     ));
@@ -132,12 +132,12 @@ class CCDAGraphicPainter extends CustomPainter {
     }
 
     drawIBMSection(i) {
-      SectionInfo sectInfo = Constants.ibmSectionInfo[i];
+      SectionInfo sectInfo = constants.ibmSectionInfo[i];
       drawSection(i, sectInfo);
     }
 
     drawCCSection(i) {
-      SectionInfo sectInfo = Constants.ccSectionInfo[i];
+      SectionInfo sectInfo = constants.ccSectionInfo[i];
       drawSection(i, sectInfo);
     }
 
