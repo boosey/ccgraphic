@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'constants.dart';
@@ -9,15 +8,17 @@ class PainterData {
   Offset widgetSize;
   Function(TapUpDetails) handleTap;
 
+  static final _nilFx = (_) => {};
+
+  PainterData.nil()
+      : this.widgetSize = Offset.zero,
+        this.handleTap = _nilFx;
+
   PainterData(this.widgetSize, this.handleTap);
 }
 
 class CCDAGraphicPaint extends StatelessWidget {
-  final double width;
-  final double height;
-  final painterData = PainterData(Offset(0, 0), (_) => {});
-
-  CCDAGraphicPaint({required this.width, required this.height});
+  final painterData = PainterData.nil();
 
   @override
   Widget build(BuildContext context) {
@@ -41,16 +42,9 @@ class CCDAGraphicPaint extends StatelessWidget {
 
 class CCDAGraphicPainter extends CustomPainter {
   final Function(PainterData) setData;
-  Offset widgetSize = Offset.zero;
   Offset center = Offset.zero;
 
   CCDAGraphicPainter(this.setData);
-
-  final ibmSectionStart = (int i) =>
-      Constants.NorthRadians + (Constants.IBMSectionPortionRadians * i);
-
-  final ibmSectionStartDegrees = (int i) =>
-      Constants.NorthDegrees + (Constants.IBMSectionPortionDegrees * i);
 
   handleTap(TapUpDetails tapUpDetails) {
     var l = tapUpDetails.localPosition;
