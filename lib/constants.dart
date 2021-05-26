@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:text_x_arc/text_x_arc.dart';
@@ -8,9 +9,7 @@ class DrawingInfo {
   Rect? rect;
   double sectionRadius = 0;
   double titleRadius = 0;
-  double Function(
-    int,
-  ) sectionStartRadians;
+  double Function(int) sectionStartRadians;
   double sectionPortionRadians;
   late TextStyle style;
   ArcTextBaseline baseline;
@@ -45,17 +44,49 @@ class SectionInfo {
     required this.sectionPortionDegrees,
   });
 
-  bool checkPointForIBM(Offset point) {
+  bool checkPointForCC(Offset point) {
     double radius = drawingInfo.sectionRadius;
-
-    double startAngle =
-        correctForNegative(drawingInfo.sectionStartDegrees(sectionNumber));
-
+    double startAngle = drawingInfo.sectionStartDegrees(sectionNumber);
     double sectionPercent = sectionPortionDegrees / 360;
     double endAngle = (360 * sectionPercent) + startAngle;
 
-    var angle = calculateAngleForPoint(point);
+    double angle = calculateAngleForPoint(point);
+    double rayLen = calculateRayLength(point);
+
+    log("s: " +
+        startAngle.truncate().toString() +
+        " e: " +
+        endAngle.truncate().toString() +
+        " a: " +
+        angle.truncate().toString() +
+        " r: " +
+        rayLen.truncate().toString());
+
+    if (startAngle > 360 - (360 / 2)) {
+      angle += 360;
+      log("Corrected angle: " + angle.truncate().toString());
+    }
+
+    if (angle >= math.min(startAngle, endAngle) &&
+        angle <= math.max(startAngle, endAngle) &&
+        rayLen < radius)
+      return true;
+    else
+      return false;
+  }
+
+  bool checkPointForIBM(Offset point) {
+    double radius = drawingInfo.sectionRadius;
+    double startAngle = drawingInfo.sectionStartDegrees(sectionNumber);
+    double sectionPercent = sectionPortionDegrees / 360;
+    double endAngle = (360 * sectionPercent) + startAngle;
+
+    double angle = calculateAngleForPoint(point);
     var rayLen = calculateRayLength(point);
+
+    if (startAngle > 360 - (360 / 8)) {
+      angle += 360;
+    }
 
     if (angle >= math.min(startAngle, endAngle) &&
         angle <= math.max(startAngle, endAngle) &&
@@ -209,7 +240,14 @@ class Constants {
   }
 
   double ibmSectionStartRadians(int i) {
-    return (Constants.IBMSectionPortionRadians * i) + painter.rotationRadians;
+    double r =
+        ((Constants.IBMSectionPortionRadians * i) + painter.rotationRadians) %
+            (math.pi * 2);
+    log("Section: " +
+        i.toString() +
+        " Start angle: " +
+        vector.degrees(r).truncate().toString());
+    return r;
   }
 
   static final ccTextStyle = TextStyle(

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:vector_math/vector_math.dart' as vector;
 import 'constants.dart';
 import 'package:text_x_arc/text_x_arc.dart';
 
@@ -11,19 +12,53 @@ class CCDAGraphicPaint2 extends StatefulWidget {
   _CCDAGraphicPaint2State createState() => _CCDAGraphicPaint2State();
 }
 
-class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2> {
-  double rotationRadians = math.pi / 8 * -5;
+enum RotationDirection {
+  Clockwise,
+  Counterclockwise,
+}
 
+class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2> {
+  late double previousRotationRadians;
+  late double rotationRadians;
+  late RotationDirection rotationDirection;
   late CCDAGraphicPainter painter;
 
   @override
   void initState() {
     super.initState();
-    painter = CCDAGraphicPainter(this);
+    previousRotationRadians = 0;
+    rotationRadians = 0;
+    rotationDirection = RotationDirection.Clockwise;
+  }
+
+  setRotationRadians(double r) {
+    setState(() {
+      // If angle is zero, then need to go another 22.5 degrees to get
+      // sector exactly vertical
+      // var extra = (rotationRadians == 0) ? math.pi / 8 : 0;
+
+      // We are only going to rotate the difference from where we are
+      // to the new location
+      // var diff = (rotationRadians - r).abs();
+
+      previousRotationRadians = rotationRadians;
+      // rotationRadians = r + extra;
+      rotationRadians = r;
+
+      var diff = (previousRotationRadians - rotationRadians);
+
+      if (0 <= diff && diff < 180) {
+        // Counterclockwise
+        rotationDirection = RotationDirection.Clockwise;
+      } else {
+        rotationDirection = RotationDirection.Counterclockwise;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    this.painter = CCDAGraphicPainter(this);
     return GestureDetector(
       onTapUp: handleTap,
       child: CustomPaint(
@@ -42,18 +77,62 @@ class CCDAGraphicPainter extends CustomPainter {
   Offset center = Offset.zero;
   late Constants constants;
 
-  CCDAGraphicPainter(this.widgetState) {
+  CCDAGraphicPainter(
+    this.widgetState,
+  ) {
     constants = Constants(this);
   }
 
   handleTap(TapUpDetails tapUpDetails) {
+    bool found = false;
     var l = tapUpDetails.localPosition;
     var zeroCenterPoint = Offset((l.dx - center.dx), (l.dy - center.dy));
-    constants.ibmSectionInfo.asMap().forEach((i, info) {
-      if (info.checkPointForIBM(zeroCenterPoint)) {
+
+    constants.ccSectionInfo.asMap().forEach((i, info) {
+      if (!found && info.checkPointForCC(zeroCenterPoint)) {
+        found = true;
         log("Clicked " + i.toString());
+
+        var r = calculateNewRotationAngleCC(i);
+
+        log("Rotation: " + vector.degrees(r).toString());
+        widgetState.setRotationRadians(r);
       }
     });
+
+    if (!found) {
+      constants.ibmSectionInfo.asMap().forEach((i, info) {
+        if (!found && info.checkPointForIBM(zeroCenterPoint)) {
+          found = true;
+          log("Clicked " + i.toString());
+
+          var r = calculateNewRotationAngleIBM(i);
+
+          log("Rotation: " + vector.degrees(r).toString());
+          widgetState.setRotationRadians(r);
+        }
+      });
+    }
+  }
+
+  double calculateNewRotationAngleCC(i) {
+    var three60 = math.pi * 2;
+    var correction = three60 * (9 / 16);
+    var sectionPortion = three60 / 2;
+
+    double r = ((sectionPortion * i) - correction);
+    log("New rotation position: " + r.truncate().toString());
+    return r;
+  }
+
+  double calculateNewRotationAngleIBM(i) {
+    var three60 = math.pi * 2;
+    var two2pt5 = three60 / 16;
+    var sectionPortion = three60 / 8;
+
+    double r = (sectionPortion * (6 - i)) - two2pt5;
+    log("New rotation position: " + r.truncate().toString());
+    return r;
   }
 
   double get rotationRadians => widgetState.rotationRadians;
@@ -165,7 +244,7 @@ class CCDAGraphicPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+    return true;
   }
 
   paintText(
