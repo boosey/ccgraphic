@@ -1,8 +1,13 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'constants.dart';
-import 'sectioninfo.dart';
+import 'ccsection.dart';
+import 'ibmsection.dart';
+import 'section.dart';
+import 'package:vector_math/vector_math.dart' as vector;
+// import 'dart:math' as math;
 
 class CCDAGraphicPaint2 extends StatefulWidget {
   @override
@@ -14,49 +19,75 @@ enum RotationDirection {
   Counterclockwise,
 }
 
-class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2> {
+class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2>
+    with TickerProviderStateMixin {
   late double previousRotationRadians;
-  late double rotationRadians;
+  late double targetRotationRadians;
   late RotationDirection rotationDirection;
   late CCDAGraphicPainter painter;
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(milliseconds: 4000),
+    vsync: this,
+  );
 
   @override
   void initState() {
     super.initState();
     previousRotationRadians = 0;
-    rotationRadians = 0;
+    targetRotationRadians = 0;
     rotationDirection = RotationDirection.Clockwise;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   setRotationRadians(double r) {
     setState(() {
-      previousRotationRadians = rotationRadians;
-      rotationRadians = r;
-
-      var diff = (previousRotationRadians - rotationRadians);
-
-      if (0 <= diff && diff < 180) {
-        // Counterclockwise
-        rotationDirection = RotationDirection.Clockwise;
-      } else {
-        rotationDirection = RotationDirection.Counterclockwise;
-      }
+      previousRotationRadians = targetRotationRadians;
+      targetRotationRadians = r;
+      var mills = (4000 *
+              ((targetRotationRadians - previousRotationRadians).abs()) /
+              Constants.r360)
+          .truncate();
+      var duration = Duration(milliseconds: mills);
+      _controller.duration = duration;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     this.painter = CCDAGraphicPainter(this);
-    return GestureDetector(
-      onTapUp: handleTap,
-      child: CustomPaint(
-        painter: painter,
+    return AnimatedBuilder(
+      animation: _controller,
+      child: Container(
+        child: GestureDetector(
+          onTapUp: handleTap,
+          child: CustomPaint(
+            painter: painter,
+          ),
+        ),
       ),
+      builder: (BuildContext context, Widget? child) {
+        double currentAngle = previousRotationRadians +
+            (_controller.value *
+                (targetRotationRadians - previousRotationRadians));
+
+        return Transform.rotate(
+          angle: currentAngle,
+          child: child,
+        );
+      },
     );
   }
 
   handleTap(TapUpDetails tapUpDetails) {
+    // this.setRotationRadians(0);
     painter.handleTap(tapUpDetails);
+    _controller.reset();
+    _controller.forward();
   }
 }
 
@@ -78,6 +109,7 @@ class CCDAGraphicPainter extends CustomPainter {
         found = true;
         var r = calculateNewRotationAngleCC(section);
         widgetState.setRotationRadians(r);
+        log("CC HIT: " + section.sectionNumber.toString());
       }
     });
 
@@ -87,13 +119,19 @@ class CCDAGraphicPainter extends CustomPainter {
           found = true;
           var r = calculateNewRotationAngleIBM(section);
           widgetState.setRotationRadians(r);
+          log("IBM HIT: " +
+              section.sectionNumber.toString() +
+              " " +
+              section.title);
         }
       });
     }
   }
 
   double calculateNewRotationAngleCC(Section section) {
-    return (section.sectionNumber * Constants.r180) + Constants.r90;
+    double r = (section.sectionNumber * Constants.r180) + Constants.r90;
+    log("new rotation angle: " + vector.degrees(r).toString());
+    return r;
   }
 
   double calculateNewRotationAngleIBM(Section section) {
@@ -102,7 +140,7 @@ class CCDAGraphicPainter extends CustomPainter {
     return r;
   }
 
-  double get rotationRadians => widgetState.rotationRadians;
+  double get rotationRadians => widgetState.targetRotationRadians;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -117,7 +155,6 @@ class CCDAGraphicPainter extends CustomPainter {
 
     CCSection.sections().forEach((section) {
       section.rotationRadians = this.rotationRadians;
-      // section.diameter = side * Constants.CCSectionSizePct;
       section.diameter = side;
       section.draw(canvas, size);
     });
