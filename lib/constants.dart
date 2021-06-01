@@ -9,6 +9,11 @@ class Constants {
   static const double r45 = r90 / 2;
   static const double r22 = r45 / 2;
 
+  static const double fullSize = 850;
+  static const double fontSize = 28;
+
+  static const int animationMilliseconds = 6000;
+
   static const ccTextStyle = TextStyle(
     color: Colors.white,
     fontWeight: FontWeight.bold,

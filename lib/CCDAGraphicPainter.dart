@@ -25,10 +25,8 @@ class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2>
   late double targetRotationRadians;
   late RotationDirection rotationDirection;
   late CCDAGraphicPainter painter;
-  late final AnimationController _controller = AnimationController(
-    duration: const Duration(milliseconds: 4000),
-    vsync: this,
-  );
+  late AnimationController _controller;
+  late CurvedAnimation _curvedAnimation;
 
   @override
   void initState() {
@@ -36,6 +34,14 @@ class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2>
     previousRotationRadians = 0;
     targetRotationRadians = 0;
     rotationDirection = RotationDirection.Clockwise;
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: Constants.animationMilliseconds),
+      vsync: this,
+    );
+
+    _curvedAnimation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeInCirc);
   }
 
   @override
@@ -48,7 +54,7 @@ class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2>
     setState(() {
       previousRotationRadians = targetRotationRadians;
       targetRotationRadians = r;
-      var mills = (4000 *
+      var mills = (Constants.animationMilliseconds *
               ((targetRotationRadians - previousRotationRadians).abs()) /
               Constants.r360)
           .truncate();
@@ -61,7 +67,7 @@ class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2>
   Widget build(BuildContext context) {
     this.painter = CCDAGraphicPainter(this);
     return AnimatedBuilder(
-      animation: _controller,
+      animation: _curvedAnimation,
       child: Container(
         child: GestureDetector(
           onTapUp: handleTap,
@@ -72,7 +78,7 @@ class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2>
       ),
       builder: (BuildContext context, Widget? child) {
         double currentAngle = previousRotationRadians +
-            (_controller.value *
+            (_curvedAnimation.value *
                 (targetRotationRadians - previousRotationRadians));
 
         return Transform.rotate(

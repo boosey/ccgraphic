@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:math' as math;
 import 'dart:ui';
+import 'package:ccgraphic/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:text_x_arc/text_x_arc.dart';
 import 'package:vector_math/vector_math.dart' as vector;
@@ -151,13 +152,17 @@ abstract class Section {
     //   sectInfo.drawingInfo.sectionStartRadians(sectInfo.sectionNumber),
     // );
 
+    double fontSize = Constants.fontSize * (this.diameter / Constants.fullSize);
+
+    TextStyle s = this.style.copyWith(fontSize: fontSize);
+
     paintArcText(
       this.title,
       canvas,
       size,
       this.titleRadius(),
       textPainter,
-      this.style,
+      s,
       this.startDrawDegrees(),
       this.startDrawDegrees() + this.sweepDegrees(),
       this.baseline,
