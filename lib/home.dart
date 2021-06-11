@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:ccgraphic/rotating_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -26,7 +25,7 @@ class HomeWidget extends StatelessWidget {
               SizedBox(
                 width: shortestSide(constraints),
                 height: shortestSide(constraints),
-                child: CCDAGraphicPaint2(),
+                child: CCDAGraphicPaint(),
               ),
               RotatingIcon(
                 width: constraints.maxWidth * Constants.CCLogoSizePct,

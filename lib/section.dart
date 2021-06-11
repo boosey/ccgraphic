@@ -50,7 +50,7 @@ abstract class Section {
 
   Rect boundingRectangle() {
     return Rect.fromCircle(
-      center: Offset(diameter / 2, diameter / 2),
+      center: Offset(radius(), radius()),
       radius: this.sectionRadius(),
     );
   }
@@ -70,13 +70,21 @@ abstract class Section {
   }
 
   correctForNegative(double a) {
-    return a < 0 ? 360 + a : a;
+    return a < 0 ? Constants.d360 + a : a;
   }
 
   calculateRayLength(Offset p) {
     var asq = math.pow(p.dx, 2);
     var bsq = math.pow(p.dy, 2);
     return math.sqrt(asq + bsq);
+  }
+
+  double sizeRatio() {
+    return this.diameter / Constants.graphicFullSize;
+  }
+
+  double radius() {
+    return diameter / 2;
   }
 
   paintArcText(
@@ -127,7 +135,8 @@ abstract class Section {
     canvas.restore();
   }
 
-  draw(Canvas canvas, Size size) {
+  void draw(Canvas canvas, Size size) {
+    // Main Arc
     canvas.drawArc(
       this.boundingRectangle(),
       this.startDrawRadians(),
@@ -136,6 +145,7 @@ abstract class Section {
       this.brush,
     );
 
+    // Outline of Arc
     canvas.drawArc(
       this.boundingRectangle(),
       this.startDrawRadians(),
@@ -152,17 +162,18 @@ abstract class Section {
     //   sectInfo.drawingInfo.sectionStartRadians(sectInfo.sectionNumber),
     // );
 
-    double fontSize = Constants.fontSize * (this.diameter / Constants.fullSize);
+    double fontSize = Constants.mainFontSize * sizeRatio();
 
-    TextStyle s = this.style.copyWith(fontSize: fontSize);
+    TextStyle style = this.style.copyWith(fontSize: fontSize);
 
+    // Section Title
     paintArcText(
       this.title,
       canvas,
       size,
       this.titleRadius(),
       textPainter,
-      s,
+      style,
       this.startDrawDegrees(),
       this.startDrawDegrees() + this.sweepDegrees(),
       this.baseline,

@@ -9,9 +9,9 @@ import 'section.dart';
 import 'package:vector_math/vector_math.dart' as vector;
 // import 'dart:math' as math;
 
-class CCDAGraphicPaint2 extends StatefulWidget {
+class CCDAGraphicPaint extends StatefulWidget {
   @override
-  _CCDAGraphicPaint2State createState() => _CCDAGraphicPaint2State();
+  _CCDAGraphicPaintState createState() => _CCDAGraphicPaintState();
 }
 
 enum RotationDirection {
@@ -19,7 +19,7 @@ enum RotationDirection {
   Counterclockwise,
 }
 
-class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2>
+class _CCDAGraphicPaintState extends State<CCDAGraphicPaint>
     with TickerProviderStateMixin {
   late double previousRotationRadians;
   late double targetRotationRadians;
@@ -98,7 +98,7 @@ class _CCDAGraphicPaint2State extends State<CCDAGraphicPaint2>
 }
 
 class CCDAGraphicPainter extends CustomPainter {
-  final _CCDAGraphicPaint2State widgetState;
+  final _CCDAGraphicPaintState widgetState;
   Offset center = Offset.zero;
 
   CCDAGraphicPainter(
